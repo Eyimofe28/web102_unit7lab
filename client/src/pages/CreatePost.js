@@ -1,8 +1,10 @@
 import React from 'react';
+import { useState } from 'react';
+import { supabase } from '../client'
 import './CreatePost.css'
 
-const CreatePost = () => {
 
+const CreatePost = ({ fetchPosts }) => {
     const [post, setPost] = useState({title: "", author: "", description: ""})
 
     const handleChange = (event) => {
@@ -13,6 +15,19 @@ const CreatePost = () => {
                 [name]:value,
             }
         })
+    }
+
+    const createPost = async (event) => {
+        event.preventDefault();
+    
+        await supabase
+        .from('Posts')
+        .insert({title: post.title, author: post.author, description: post.description})
+        .select();
+        
+        await fetchPosts(); // Refresh posts list
+
+        window.location = "/";
     }
 
     return (
@@ -27,10 +42,9 @@ const CreatePost = () => {
                 <br/>
 
                 <label for="description">Description</label><br />
-                <textarea rows="5" cols="50" id="description" onChange={handleChange}>
-                </textarea>
+                <textarea rows="5" cols="50" id="description" name="description" onChange={handleChange}></textarea>
                 <br/>
-                <input type="submit" value="Submit" />
+                <input type="submit" value="Submit" onClick={createPost} />
             </form>
         </div>
     )
